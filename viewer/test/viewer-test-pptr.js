@@ -8,7 +8,6 @@ import fs from 'fs';
 import assert from 'assert/strict';
 
 import puppeteer from 'puppeteer';
-import {expect} from 'expect';
 
 import {Server} from '../../cli/test/fixtures/static-server.js';
 import defaultConfig from '../../core/config/default-config.js';
@@ -265,7 +264,7 @@ describe('Lighthouse Viewer', () => {
     });
   });
 
-  describe.only('Renders old reports', () => {
+  describe('Renders old reports', () => {
     [
       'lhr-3.0.0.json',
       'lhr-4.3.0.json',
