@@ -9,7 +9,7 @@ We expect this release to ship in the DevTools of [Chrome XX](https://chromiumda
 
 ## Notable Changes
 
-~~ TODO: Move notable changes here ~~
+TODO: most things here should get some details
 
 * Types TODO say more.
 * Lighthouse documentation now lives on [developer.chrome.com](developer.chrome.com).
@@ -21,9 +21,30 @@ We expect this release to ship in the DevTools of [Chrome XX](https://chromiumda
 * [BREAKING] rename lighthouse-(core,cli) folders ([#14242](https://github.com/GoogleChrome/lighthouse/pull/14242))
 * [BREAKING] add `finalDisplayedUrl`, `mainDocumentUrl` to LHR. deprecate `finalUrl` ([#14149](https://github.com/GoogleChrome/lighthouse/pull/14149))
 
+### Entity classification
+
+TODO
+
+- mention new value in LHR
+- mention changes to report
+
 ## New Audits
 
+### Back/forward cache
+
 * bf-cache ([#14465](https://github.com/GoogleChrome/lighthouse/pull/14465))
+
+The Back/forward cache (bfcache for short) is a browser optimization that serves pages from fully serialized snapshots when navigating back or fowards in your session history. There are over 100 different reasons why a page may not be eligible for this optimization, so to assist developers Lighthouse now attempts to trigger a bfcache response and will list anything that prevented the browser from using the bfcache.
+
+For more on bfcache, see [the web.dev article](https://web.dev/bfcache/).
+
+### Prioritize LCP image with Fetch Priority
+
+TODO
+
+### Preventing pasting to inputs
+
+TODO
 
 ## Removed Audits
 
