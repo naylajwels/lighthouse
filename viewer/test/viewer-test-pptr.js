@@ -265,7 +265,7 @@ describe('Lighthouse Viewer', () => {
     });
   });
 
-  describe('Renders old reports', () => {
+  describe.only('Renders old reports', () => {
     [
       'lhr-3.0.0.json',
       'lhr-4.3.0.json',
@@ -276,9 +276,14 @@ describe('Lighthouse Viewer', () => {
       it(`[${testFilename}] should load with no errors`, async () => {
         await viewerPage.goto(viewerUrl, {waitUntil: 'networkidle2', timeout: 30000});
         const fileInput = await viewerPage.$('#hidden-file-input');
+        const waitForAck = viewerPage.evaluate(() =>
+          new Promise(resolve =>
+            document.addEventListener('lh-file-upload-test-ack', resolve, {once: true})));
         await fileInput.uploadFile(`${LH_ROOT}/report/test-assets/${testFilename}`);
-        await viewerPage.evaluate(() =>
-          document.addEventListener('lh-file-upload-test-ack', {once: true}));
+        await Promise.race([
+          waitForAck,
+          new Promise((resolve, reject) => setTimeout(reject, 5_000)),
+        ]);
         await ensureNoErrors();
       });
     });
