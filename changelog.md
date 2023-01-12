@@ -15,6 +15,7 @@ We expect this release to ship in the DevTools of [Chrome XX](https://chromiumda
 * Lighthouse documentation now lives on [developer.chrome.com](developer.chrome.com).
 * [BREAKING] Scoring
 * [BREAKING] Node API
+* [BREAKING] Use new Fraggle Rock runner by default, deprecate legacy runner. <TODO note: this just links to the Node change> ([#13783](https://github.com/GoogleChrome/lighthouse/pull/13783))
 * [BREAKING] convert to ES modules ([#12689](https://github.com/GoogleChrome/lighthouse/issues/12689))
 * [BREAKING] drop support for node 14 ([#14413](https://github.com/GoogleChrome/lighthouse/pull/14413))
 * [BREAKING] rename lighthouse-(core,cli) folders ([#14242](https://github.com/GoogleChrome/lighthouse/pull/14242))
@@ -92,14 +93,6 @@ We expect this release to ship in the DevTools of [Chrome XX](https://chromiumda
 * fps: limit height at max webp size ([#14499](https://github.com/GoogleChrome/lighthouse/pull/14499))
 * fps: use observed metrics for screenshot dimensions ([#14418](https://github.com/GoogleChrome/lighthouse/pull/14418))
 * fps: make lhId less dependent on chrome internals ([#14272](https://github.com/GoogleChrome/lighthouse/pull/14272))
-* fr: update flow API for 10.0 ([#14388](https://github.com/GoogleChrome/lighthouse/pull/14388))
-* fr: always run NetworkUserAgent gatherer ([#14392](https://github.com/GoogleChrome/lighthouse/pull/14392))
-* fr: add page to context ([#14359](https://github.com/GoogleChrome/lighthouse/pull/14359))
-* fr: replace `configContext` with `flags` ([#14050](https://github.com/GoogleChrome/lighthouse/pull/14050))
-* fr: index test parity ([#13867](https://github.com/GoogleChrome/lighthouse/pull/13867))
-* fr: minor renames: cdpSession, defaultSession, requestfinished ([#14097](https://github.com/GoogleChrome/lighthouse/pull/14097))
-* fr: do not monkey patch puppeteer session.emit ([#14087](https://github.com/GoogleChrome/lighthouse/pull/14087))
-* fr: make FR navigations the default in node ([#13783](https://github.com/GoogleChrome/lighthouse/pull/13783))
 * full-page-screenshot: use webp instead of jpeg ([#13828](https://github.com/GoogleChrome/lighthouse/pull/13828))
 * i18n: delete `i18n.createMessageInstanceIdFn` ([#14251](https://github.com/GoogleChrome/lighthouse/pull/14251))
 * image-elements: use execution context isolation ([#14005](https://github.com/GoogleChrome/lighthouse/pull/14005))
@@ -144,6 +137,18 @@ We expect this release to ship in the DevTools of [Chrome XX](https://chromiumda
 * use `resolvedConfig` to name every resolved config ([#14600](https://github.com/GoogleChrome/lighthouse/pull/14600))
 * rename resolved config types ([#14647](https://github.com/GoogleChrome/lighthouse/pull/14647))
 * remove trace-of-tab references ([#14590](https://github.com/GoogleChrome/lighthouse/pull/14590))
+
+## ⛏️👷 Fraggle Rock
+
+  Support for auditing user flows ([#11313](https://github.com/GoogleChrome/lighthouse/issues/11313))
+
+* [BREAKING] replace `configContext` with `flags` ([#14050](https://github.com/GoogleChrome/lighthouse/pull/14050))
+* add page to context ([#14359](https://github.com/GoogleChrome/lighthouse/pull/14359))
+* update flow API for 10.0 ([#14388](https://github.com/GoogleChrome/lighthouse/pull/14388))
+* always run NetworkUserAgent gatherer ([#14392](https://github.com/GoogleChrome/lighthouse/pull/14392))
+* index test parity ([#13867](https://github.com/GoogleChrome/lighthouse/pull/13867))
+* do not monkey patch puppeteer session.emit ([#14087](https://github.com/GoogleChrome/lighthouse/pull/14087))
+* minor renames: cdpSession, defaultSession, requestfinished ([#14097](https://github.com/GoogleChrome/lighthouse/pull/14097))
 
 ## CLI
 
