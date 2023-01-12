@@ -7,7 +7,6 @@
 import assert from 'assert/strict';
 
 import jestMock from 'jest-mock';
-import {expect} from 'expect';
 
 import {runLighthouseInLR} from '../../lightrider/lightrider-entry.js';
 import {Runner} from '../../../core/runner.js';
