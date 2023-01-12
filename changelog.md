@@ -1,7 +1,7 @@
-<!-- TODO: finish! updated as of 1b4e2f99cadf49081928d547d6bc7cf7612cabbf #14591 -->
+<!-- TODO ! updated as of e9fd78a4991577e39e7f0a6c1de929331021dc62 #14591 -->
 
 <a name="10.0.0"></a>
-# 10.0.0 (2022-12-06)
+# 10.0.0 (2023-02-01) TODO ! update me
 [Full Changelog](https://github.com/GoogleChrome/lighthouse/compare/v9.5.0...f03850a)
 
 ~~ TODO: https://chromiumdash.appspot.com/schedule ~~
@@ -11,17 +11,18 @@ We expect this release to ship in the DevTools of [Chrome XX](https://chromiumda
 
 ~~ TODO: Move notable changes here ~~
 
-* Types
+* Types TODO say more.
 * Lighthouse documentation now lives on [developer.chrome.com](developer.chrome.com).
 * [BREAKING] Scoring
 * [BREAKING] Node API
 * [BREAKING] convert to ES modules ([#12689](https://github.com/GoogleChrome/lighthouse/issues/12689))
 * [BREAKING] drop support for node 14 ([#14413](https://github.com/GoogleChrome/lighthouse/pull/14413))
 * [BREAKING] rename lighthouse-(core,cli) folders ([#14242](https://github.com/GoogleChrome/lighthouse/pull/14242))
+* [BREAKING] add `finalDisplayedUrl`, `mainDocumentUrl` to LHR. deprecate `finalUrl` ([#14149](https://github.com/GoogleChrome/lighthouse/pull/14149))
 
 ## New Audits
 
-TODO: we'll have stuff here soon
+* bf-cache ([#14465](https://github.com/GoogleChrome/lighthouse/pull/14465))
 
 ## Removed Audits
 
@@ -30,17 +31,22 @@ TODO: we'll have stuff here soon
 
 ## Core
 
+* add `usePassiveGathering` flag ([#14610](https://github.com/GoogleChrome/lighthouse/pull/14610))
+* finalize master => main branch rename ([#14409](https://github.com/GoogleChrome/lighthouse/pull/14409))
+* is-crawlable: only warn if some bots are blocked ([#14550](https://github.com/GoogleChrome/lighthouse/pull/14550))
+* doctype: check for limited quirks mode ([#14576](https://github.com/GoogleChrome/lighthouse/pull/14576))
 * add `BFCacheFailures` artifact ([#14485](https://github.com/GoogleChrome/lighthouse/pull/14485))
 * use LCP specific message for NO_LCP ([#14556](https://github.com/GoogleChrome/lighthouse/pull/14556))
+* i18n: fix path bug resulting in invalid i18n id via npx ([#14314](https://github.com/GoogleChrome/lighthouse/pull/14314))
+* warn when clear storage times out ([#14476](https://github.com/GoogleChrome/lighthouse/pull/14476))
 * expose default and desktop configs on `index.js` ([#14543](https://github.com/GoogleChrome/lighthouse/pull/14543))
 * remove globals from `externs.d.ts` ([#14537](https://github.com/GoogleChrome/lighthouse/pull/14537))
 * merge `api.js` into `index.js`, new report generator api ([#14531](https://github.com/GoogleChrome/lighthouse/pull/14531))
 * remove deprecated flags check ([#14454](https://github.com/GoogleChrome/lighthouse/pull/14454))
 * make `bypass`, `th-has-data-cells`, and `video-caption` informative ([#14453](https://github.com/GoogleChrome/lighthouse/pull/14453))
-* add `finalDisplayedUrl`, `mainDocumentUrl` to LHR. deprecate `finalUrl` ([#14149](https://github.com/GoogleChrome/lighthouse/pull/14149))
 * save lhr to latest-run/ for -A, not just -GA ([#14414](https://github.com/GoogleChrome/lighthouse/pull/14414))
-* finalize master => main branch rename ([#14409](https://github.com/GoogleChrome/lighthouse/pull/14409))
 * remove `fraggle-rock` directory ([#14377](https://github.com/GoogleChrome/lighthouse/pull/14377))
+* use-landmarks: fix missing markdown in description ([#14608](https://github.com/GoogleChrome/lighthouse/pull/14608))
 * remove sd-validation audit files ([#14391](https://github.com/GoogleChrome/lighthouse/pull/14391))
 * remove replay stringify extension ([#14330](https://github.com/GoogleChrome/lighthouse/pull/14330))
 * rename url-shim to url-utils, stop extending global URL ([#14360](https://github.com/GoogleChrome/lighthouse/pull/14360))
@@ -131,6 +137,13 @@ TODO: we'll have stuff here soon
 * uses-responsive-images: higher threshold with breakpoints ([#13853](https://github.com/GoogleChrome/lighthouse/pull/13853))
 * viewport: fix tap delay link ([#14460](https://github.com/GoogleChrome/lighthouse/pull/14460))
 * page-functions: remove all `*String` exports ([#14374](https://github.com/GoogleChrome/lighthouse/pull/14374))
+* internalize resolved configs ([#14589](https://github.com/GoogleChrome/lighthouse/pull/14589))
+* asset-saver: save flow artifacts in separate files ([#14599](https://github.com/GoogleChrome/lighthouse/pull/14599))
+* replace `Page.getResourceTree` with `Page.getFrameTree` ([#14663](https://github.com/GoogleChrome/lighthouse/pull/14663))
+* js-usage: ignore __puppeteer_evaluation_script__ ([#13952](https://github.com/GoogleChrome/lighthouse/pull/13952))
+* use `resolvedConfig` to name every resolved config ([#14600](https://github.com/GoogleChrome/lighthouse/pull/14600))
+* rename resolved config types ([#14647](https://github.com/GoogleChrome/lighthouse/pull/14647))
+* remove trace-of-tab references ([#14590](https://github.com/GoogleChrome/lighthouse/pull/14590))
 
 ## CLI
 
@@ -156,6 +169,7 @@ TODO: we'll have stuff here soon
 * avoid css issue with border when hoisting meta block ([#13877](https://github.com/GoogleChrome/lighthouse/pull/13877))
 * dom: support code snippets within markdown links ([#14121](https://github.com/GoogleChrome/lighthouse/pull/14121))
 * flow: fix ui strings not being bundled ([#14427](https://github.com/GoogleChrome/lighthouse/pull/14427))
+* fix wording when screenEmulation disabled ([#14587](https://github.com/GoogleChrome/lighthouse/pull/14587))
 * remove eslint --fix step in report generation ([#13864](https://github.com/GoogleChrome/lighthouse/pull/13864))
 * consolidate table headers ([#14315](https://github.com/GoogleChrome/lighthouse/pull/14315))
 
@@ -164,8 +178,10 @@ TODO: we'll have stuff here soon
 * puppeteer: upgrade to 16.1.0 ([#14244](https://github.com/GoogleChrome/lighthouse/pull/14244))
 * chrome-launcher@0.15.1 ([#14070](https://github.com/GoogleChrome/lighthouse/pull/14070))
 * upgrade third-party-web to 0.20.2 ([#14546](https://github.com/GoogleChrome/lighthouse/pull/14546))
+* update to latest chrome-devtools-frontend ([#14606](https://github.com/GoogleChrome/lighthouse/pull/14606))
 * switch third-party-web dataset to entities-nostats subset ([#14548](https://github.com/GoogleChrome/lighthouse/pull/14548))
 * update to typescript 4.7 ([#14058](https://github.com/GoogleChrome/lighthouse/pull/14058))
+* update to typescript 4.9.4 ([#14646](https://github.com/GoogleChrome/lighthouse/pull/14646))
 * update typescript-eslint for tsc 4.7 ([#14111](https://github.com/GoogleChrome/lighthouse/pull/14111))
 * jpeg-js: upgrade to 0.4.4 ([#14221](https://github.com/GoogleChrome/lighthouse/pull/14221))
 * bump node-fetch from 2.6.1 to 2.6.7 ([#13759](https://github.com/GoogleChrome/lighthouse/pull/13759))
@@ -215,6 +231,8 @@ TODO: we'll have stuff here soon
 * user-flows: refactor document ([#14021](https://github.com/GoogleChrome/lighthouse/pull/14021))
 * user-flows: add instructions for DevTools ([#14009](https://github.com/GoogleChrome/lighthouse/pull/14009))
 * user-flows: update api usage ([#13826](https://github.com/GoogleChrome/lighthouse/pull/13826))
+* update user-flow.md to reflect current release ([#14604](https://github.com/GoogleChrome/lighthouse/pull/14604))
+* config: add plugins property ([#14645](https://github.com/GoogleChrome/lighthouse/pull/14645))
 * changelog: add 9.6.x release notes ([f03850a](https://github.com/GoogleChrome/lighthouse/commit/f03850a))
 
 ## Tests
@@ -276,6 +294,8 @@ TODO: we'll have stuff here soon
 * devtools: extend yarn timeout ([#13878](https://github.com/GoogleChrome/lighthouse/pull/13878))
 * devtools: reduce concurrent job number ([#13797](https://github.com/GoogleChrome/lighthouse/pull/13797))
 * devtools: bump cache ([#13755](https://github.com/GoogleChrome/lighthouse/pull/13755))
+* devtools: support dbw smoke ([#14616](https://github.com/GoogleChrome/lighthouse/pull/14616))
+* devtools: use correct build folder for e2e tests ([#14613](https://github.com/GoogleChrome/lighthouse/pull/14613))
 * docs: clear problematic cache ([#13941](https://github.com/GoogleChrome/lighthouse/pull/13941))
 * eslint: add import/order rule for core tests ([#13955](https://github.com/GoogleChrome/lighthouse/pull/13955))
 * fr: snapshot audit id lists in api test ([#13994](https://github.com/GoogleChrome/lighthouse/pull/13994))
@@ -298,8 +318,11 @@ TODO: we'll have stuff here soon
 * smoke: increase windows retries ([#14022](https://github.com/GoogleChrome/lighthouse/pull/14022))
 * smoke: run bundle smokes in a worker ([#13947](https://github.com/GoogleChrome/lighthouse/pull/13947))
 * smoke: realign byte ranges ([#13920](https://github.com/GoogleChrome/lighthouse/pull/13920))
+* smoke: disable `lantern-idle-callback-short` ([#14670](https://github.com/GoogleChrome/lighthouse/pull/14670))
 * topbar: replace module mock with dependency injection ([#14057](https://github.com/GoogleChrome/lighthouse/pull/14057))
 * unit: fix node to 16.16 ([#14333](https://github.com/GoogleChrome/lighthouse/pull/14333))
+* rewrite fake timer usage to reduce isolation ([#14595](https://github.com/GoogleChrome/lighthouse/pull/14595))
+* add computed/metrics/interactive-test.js to tsconfig ([#13071](https://github.com/GoogleChrome/lighthouse/pull/13071))
 
 ## Misc
 
@@ -330,6 +353,8 @@ TODO: we'll have stuff here soon
 * mark build folder as not generated for GitHub UI ([#14192](https://github.com/GoogleChrome/lighthouse/pull/14192))
 * rename eslint config files to .cjs ([#14172](https://github.com/GoogleChrome/lighthouse/pull/14172))
 * restore expected newline padding around imports ([#13998](https://github.com/GoogleChrome/lighthouse/pull/13998))
+* fix gcp-collection scripts ([#14625](https://github.com/GoogleChrome/lighthouse/pull/14625))
+* update vercel deployment config ([#14588](https://github.com/GoogleChrome/lighthouse/pull/14588))
 * add brendan back to triage rotation ([#13838](https://github.com/GoogleChrome/lighthouse/pull/13838))
 
 <a name="9.6.8"></a>
