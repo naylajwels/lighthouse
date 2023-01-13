@@ -10,11 +10,11 @@
  * user input in the provided trace).
  */
 
-/** @typedef {LH.Trace.CompleteEvent & {name: 'Responsiveness.Renderer.UserInteraction', args: {frame?: string, data: {interactionType: 'drag'|'keyboard'|'tapOrClick', maxDuration: number, frame?: string}}}} ResponsivenessEvent */
+/** @typedef {LH.Trace.CompleteEvent & {name: 'Responsiveness.Renderer.UserInteraction', args: {frame: string, data: {interactionType: 'drag'|'keyboard'|'tapOrClick', maxDuration: number}}}} ResponsivenessEvent */
 /** @typedef {'keydown'|'keypress'|'keyup'|'mousedown'|'mouseup'|'pointerdown'|'pointerup'|'click'} EventTimingType */
 /**
  * @typedef EventTimingData
- * @property {string=} frame
+ * @property {string} frame
  * @property {number} timeStamp The time of user interaction (in ms from navStart).
  * @property {number} processingStart The start of interaction handling (in ms from navStart).
  * @property {number} processingEnd The end of interaction handling (in ms from navStart).
@@ -23,7 +23,7 @@
  * @property {number} nodeId
  * @property {number} interactionId
  */
-/** @typedef {LH.Trace.AsyncEvent & {name: 'EventTiming', args: {data: EventTimingData, frame?: string}}} EventTimingEvent */
+/** @typedef {LH.Trace.AsyncEvent & {name: 'EventTiming', args: {data: EventTimingData}}} EventTimingEvent */
 /**
  * A fallback EventTiming placeholder, used if updated EventTiming events are not available.
  * TODO: Remove once 103.0.5052.0 is sufficiently released.
@@ -87,14 +87,8 @@ class Responsiveness {
       return evt.name === 'EventTiming' && evt.ph !== 'e';
     });
 
-    // If trace is from < m103, the timestamps cannot be trusted
-    // TODO(compat): remove FallbackTiming handling when we don't care about <m103
-    if (
-      candidates.length &&
-      // !some == none. If none of the candidates have a frame, bail.
-      !candidates.some(candidate => candidate.args.frame || candidate.args.data?.frame)
-    ) {
-      // Full EventTiming data added in https://crrev.com/c/3632661. Shipped in m103
+    if (candidates.length && !candidates.some(candidate => candidate.args.data?.frame)) {
+      // Full EventTiming data added in https://crrev.com/c/3632661
       return {
         name: 'FallbackTiming',
         duration: responsivenessEvent.args.data.maxDuration,
@@ -104,16 +98,10 @@ class Responsiveness {
     const {maxDuration, interactionType} = responsivenessEvent.args.data;
     let bestMatchEvent;
     let minDurationDiff = Number.POSITIVE_INFINITY;
-
-    /** @param {LH.TraceEvent} e */
-    function residesInSameFrame(e) {
-      return e.args?.data?.frame === responsivenessEvent.args.frame ||
-      e.args.frame === responsivenessEvent.args.frame;
-    }
-
     for (const candidate of candidates) {
       // Must be from same frame.
-      if (!residesInSameFrame(candidate)) continue;
+      if (candidate.args.data.frame !== responsivenessEvent.args.frame) continue;
+
       // TODO(bckenny): must be in same navigation as well.
 
       const {type, duration} = candidate.args.data;
