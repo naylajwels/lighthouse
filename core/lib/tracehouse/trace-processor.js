@@ -482,7 +482,7 @@ class TraceProcessor {
   }
 
   /**
-   * If there were a any cross-origin navigations, there'll be more than one pid returned
+   * If there were any cross-origin navigations, there'll be more than one pid returned
    * @param {{startingPid: number, frameId: string}} mainFrameInfo
    * @param {LH.TraceEvent[]} keyEvents
    * @return {Map<number, number>} Map where keys are process IDs and their values are thread IDs
