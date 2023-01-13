@@ -482,7 +482,7 @@ class TraceProcessor {
   }
 
   /**
-   * If there were multiple cross-origin navigations in the trace, there'll be more than one pid returned
+   * If there were a any cross-origin navigations, there'll be more than one pid returned
    * @param {{startingPid: number, frameId: string}} mainFrameInfo
    * @param {LH.TraceEvent[]} keyEvents
    * @return {Map<number, number>} Map where keys are process IDs and their values are thread IDs
@@ -634,6 +634,9 @@ class TraceProcessor {
       while (parentFrames.has(cur)) {
         cur = /** @type {string} */ (parentFrames.get(cur));
       }
+      if (cur === undefined) {
+        throw new Error('Unexpected undefined frameId');
+      }
       frameIdToRootFrameId.set(frame.id, cur);
     }
 
@@ -661,12 +664,12 @@ class TraceProcessor {
 
     // Find the inspected frame
     const mainFrameInfo = this.findMainFrameIds(keyEvents);
-    const rendererPidTids = this.findMainFramePidTids(mainFrameInfo, keyEvents);
+    const rendererPidToTid = this.findMainFramePidTids(mainFrameInfo, keyEvents);
 
     // Subset all trace events to just our tab's process (incl threads other than main)
     // stable-sort events to keep them correctly nested.
     const processEvents = TraceProcessor
-      .filteredTraceSort(trace.traceEvents, e => rendererPidTids.has(e.pid));
+      .filteredTraceSort(trace.traceEvents, e => rendererPidToTid.has(e.pid));
 
     // TODO(paulirish): filter down frames (and subsequent actions) to the primary process tree & frame tree
 
@@ -709,13 +712,8 @@ class TraceProcessor {
     const frameIdToRootFrameId = this.resolveRootFrames(frames);
 
     const inspectedTreeFrameIds = [...frameIdToRootFrameId.entries()]
-      .filter(([childFrameId, rootFrameId]) => rootFrameId === mainFrameInfo.frameId) // eslint-disable-line no-unused-vars
-      .map(([child, root]) => child); // eslint-disable-line no-unused-vars
-
-    // @ts-expect-error frameIdToRootFrameId's values were casted to string. Runtime check here to confirm.
-    if (inspectedTreeFrameIds.includes(undefined)) {
-      throw new Error('Unexpected undefined in frameIdToRootFrameId');
-    }
+      .filter(([, rootFrameId]) => rootFrameId === mainFrameInfo.frameId)
+      .map(([child]) => child);
 
     // Filter to just events matching the main frame ID, just to make sure.
     /** @param {LH.TraceEvent} e */
@@ -753,7 +751,7 @@ class TraceProcessor {
       timeOriginDeterminationMethod
     );
 
-    const mainThreadEvents = processEvents.filter(e => e.tid === rendererPidTids.get(e.pid));
+    const mainThreadEvents = processEvents.filter(e => e.tid === rendererPidToTid.get(e.pid));
 
     // Ensure our traceEnd reflects all page activity.
     const traceEnd = this.computeTraceEnd(trace.traceEvents, timeOriginEvt);
@@ -777,7 +775,7 @@ class TraceProcessor {
         traceEnd: traceEnd.timestamp,
       },
       _keyEvents: keyEvents,
-      _rendererPidTids: rendererPidTids,
+      _rendererPidToTid: rendererPidToTid,
     };
   }
 

@@ -727,7 +727,7 @@ declare module Artifacts {
     /** All received trace events subsetted to important categories. */
     _keyEvents: Array<TraceEvent>;
     /** Map where keys are process IDs and their values are thread IDs */
-    _rendererPidTids: Map<number, number>;
+    _rendererPidToTid: Map<number, number>;
   }
 
   interface ProcessedNavigation {

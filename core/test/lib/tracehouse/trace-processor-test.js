@@ -942,7 +942,7 @@ Object {
 
       const mainFramePids = new Set();
       mainFramePids.add(processed.mainFrameInfo.startingPid);
-      [...processed._rendererPidTids.keys()].forEach(pid => mainFramePids.add(pid));
+      [...processed._rendererPidToTid.keys()].forEach(pid => mainFramePids.add(pid));
 
       return {processEventsPct, frameEventsPct, mainFramePids};
     }
