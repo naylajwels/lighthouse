@@ -4,26 +4,26 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import parseManifest = require('../lighthouse-core/lib/manifest-parser.js');
-import LanternSimulator = require('../lighthouse-core/lib/dependency-graph/simulator/simulator.js');
-import LighthouseError = require('../lighthouse-core/lib/lh-error.js');
-import _NetworkRequest = require('../lighthouse-core/lib/network-request.js');
-import speedline = require('speedline-core');
-import TextSourceMap = require('../lighthouse-core/lib/cdt/generated/SourceMap.js');
-import ArbitraryEqualityMap = require('../lighthouse-core/lib/arbitrary-equality-map.js');
-
-type _TaskNode = import('../lighthouse-core/lib/tracehouse/main-thread-tasks.js').TaskNode;
-
+import {parseManifest} from '../core/lib/manifest-parser.js';
+import {Simulator} from '../core/lib/dependency-graph/simulator/simulator.js';
+import {LighthouseError} from '../core/lib/lh-error.js';
+import {NetworkRequest as _NetworkRequest} from '../core/lib/network-request.js';
+import speedline from 'speedline-core';
+import TextSourceMap from '../core/lib/cdt/generated/SourceMap.js';
+import {ArbitraryEqualityMap} from '../core/lib/arbitrary-equality-map.js';
+import type { TaskNode as _TaskNode } from '../core/lib/tracehouse/main-thread-tasks.js';
 import AuditDetails from './lhr/audit-details'
 import Config from './config';
 import Gatherer from './gatherer';
 import {IcuMessage} from './lhr/i18n';
 import LHResult from './lhr/lhr'
 import Protocol from './protocol';
+import Util from './utility-types.js';
+import Audit from './audit.js';
 
 export interface Artifacts extends BaseArtifacts, GathererArtifacts {}
 
-export type FRArtifacts = StrictOmit<Artifacts,
+export type FRArtifacts = Util.StrictOmit<Artifacts,
   | 'Fonts'
   | 'Manifest'
   | 'MixedContent'
@@ -49,6 +49,8 @@ interface UniversalBaseArtifacts {
   LighthouseRunWarnings: Array<string | IcuMessage>;
   /** The benchmark index that indicates rough device class. */
   BenchmarkIndex: number;
+  /** Many benchmark indexes. Many. */
+  BenchmarkIndexes?: number[];
   /** An object containing information about the testing configuration used by Lighthouse. */
   settings: Config.Settings;
   /** The timing instrumentation of the gather portion of a run. */
@@ -77,12 +79,6 @@ interface ContextualBaseArtifacts {
 interface LegacyBaseArtifacts {
   /** The user agent string that Lighthouse used to load the page. Set to the empty string if unknown. */
   NetworkUserAgent: string;
-  /** Information on detected tech stacks (e.g. JS libraries) used by the page. */
-  Stacks: Artifacts.DetectedStack[];
-  /** Parsed version of the page's Web App Manifest, or null if none found. This moved to a regular artifact in Fraggle Rock. */
-  WebAppManifest: Artifacts.Manifest | null;
-  /** Errors preventing page being installable as PWA. This moved to a regular artifact in Fraggle Rock. */
-  InstallabilityErrors: Artifacts.InstallabilityErrors;
   /** A set of page-load traces, keyed by passName. */
   traces: {[passName: string]: Trace};
   /** A set of DevTools debugger protocol records, keyed by passName. */
@@ -122,6 +118,8 @@ export interface GathererArtifacts extends PublicGathererArtifacts,LegacyBaseArt
   Accessibility: Artifacts.Accessibility;
   /** Array of all anchors on the page. */
   AnchorElements: Artifacts.AnchorElement[];
+  /** Errors when attempting to use the back/forward cache. */
+  BFCacheFailures: Artifacts.BFCacheFailure[];
   /** Array of all URLs cached in CacheStorage. */
   CacheContents: string[];
   /** CSS coverage information for styles used by page's final state. */
@@ -142,11 +140,13 @@ export interface GathererArtifacts extends PublicGathererArtifacts,LegacyBaseArt
   /** All the input elements, including associated form and label elements. */
   Inputs: {inputs: Artifacts.InputElement[]; forms: Artifacts.FormElement[]; labels: Artifacts.LabelElement[]};
   /** Screenshot of the entire page (rather than just the above the fold content). */
-  FullPageScreenshot: Artifacts.FullPageScreenshot | null;
+  FullPageScreenshot: LHResult.FullPageScreenshot | null;
   /** Information about event listeners registered on the global object. */
   GlobalListeners: Array<Artifacts.GlobalListener>;
   /** The issues surfaced in the devtools Issues panel */
   InspectorIssues: Artifacts.InspectorIssues;
+  /** Errors preventing page being installable as PWA. */
+  InstallabilityErrors: Artifacts.InstallabilityErrors;
   /** JS coverage information for code used during audit. Keyed by script id. */
   // 'url' is excluded because it can be overriden by a magic sourceURL= comment, which makes keeping it a dangerous footgun!
   JsUsage: Record<string, Omit<LH.Crdp.Profiler.ScriptCoverage, 'url'>>;
@@ -168,6 +168,8 @@ export interface GathererArtifacts extends PublicGathererArtifacts,LegacyBaseArt
   ServiceWorker: {versions: LH.Crdp.ServiceWorker.ServiceWorkerVersion[], registrations: LH.Crdp.ServiceWorker.ServiceWorkerRegistration[]};
   /** Source maps of scripts executed in the page. */
   SourceMaps: Array<Artifacts.SourceMap>;
+  /** Information on detected tech stacks (e.g. JS libraries) used by the page. */
+  Stacks: Artifacts.DetectedStack[];
   /** Information on <script> and <link> tags blocking first paint. */
   TagsBlockingFirstPaint: Artifacts.TagBlockingFirstPaint[];
   /** Information about tap targets including their position and size. */
@@ -176,10 +178,12 @@ export interface GathererArtifacts extends PublicGathererArtifacts,LegacyBaseArt
   Trace: Trace;
   /** Elements associated with metrics (ie: Largest Contentful Paint element). */
   TraceElements: Artifacts.TraceElement[];
+  /** Parsed version of the page's Web App Manifest, or null if none found. */
+  WebAppManifest: Artifacts.Manifest | null;
 }
 
 declare module Artifacts {
-  type ComputedContext = Immutable<{
+  type ComputedContext = Util.Immutable<{
     computedCache: Map<string, ArbitraryEqualityMap>;
   }>;
 
@@ -188,8 +192,6 @@ declare module Artifacts {
   type MetaElement = Artifacts['MetaElements'][0];
 
   interface URL {
-    /** URL of the main frame before Lighthouse starts. */
-    initialUrl: string;
     /**
      * URL of the initially requested URL during a Lighthouse navigation.
      * Will be `undefined` in timespan/snapshot.
@@ -200,12 +202,8 @@ declare module Artifacts {
      * Will be `undefined` in timespan/snapshot.
      */
     mainDocumentUrl?: string;
-    /**
-     * Will be the same as `mainDocumentUrl` in navigation mode.
-     * Wil be the URL of the main frame after Lighthouse finishes in timespan/snapshot.
-     * TODO: Use the main frame URL in navigation mode as well.
-     */
-    finalUrl: string;
+    /** URL displayed on the page after Lighthouse finishes. */
+    finalDisplayedUrl: string;
   }
 
   interface NodeDetails {
@@ -252,6 +250,7 @@ declare module Artifacts {
     name: string;
     publicId: string;
     systemId: string;
+    documentCompatMode: string;
   }
 
   interface DOMStats {
@@ -415,6 +414,16 @@ declare module Artifacts {
     }>
   }
 
+  type BFCacheReasonMap = {
+    [key in LH.Crdp.Page.BackForwardCacheNotRestoredReason]?: string[];
+  };
+
+  type BFCacheNotRestoredReasonsTree = Record<LH.Crdp.Page.BackForwardCacheNotRestoredReasonType, BFCacheReasonMap>;
+
+  interface BFCacheFailure {
+    notRestoredReasonsTree: BFCacheNotRestoredReasonsTree;
+  }
+
   interface Font {
     display: string;
     family: string;
@@ -572,11 +581,12 @@ declare module Artifacts {
   }
 
   interface TraceElement {
-    traceEventType: 'largest-contentful-paint'|'layout-shift'|'animation';
+    traceEventType: 'largest-contentful-paint'|'layout-shift'|'animation'|'responsiveness';
     score?: number;
     node: NodeDetails;
     nodeId?: number;
     animations?: {name?: string, failureReasonsMask?: number, unsupportedProperties?: string[]}[];
+    type?: string;
   }
 
   interface ViewportDimensions {
@@ -638,9 +648,9 @@ declare module Artifacts {
   interface MetricComputationDataInput {
     devtoolsLog: DevtoolsLog;
     trace: Trace;
-    settings: Immutable<Config.Settings>;
+    settings: Audit.Context['settings'];
     gatherContext: Artifacts['GatherContext'];
-    simulator?: InstanceType<typeof LanternSimulator>;
+    simulator?: InstanceType<typeof Simulator>;
     URL: Artifacts['URL'];
   }
 
@@ -758,16 +768,6 @@ declare module Artifacts {
     version?: string;
     /** The package name on NPM, if it exists. */
     npm?: string;
-  }
-
-  interface FullPageScreenshot {
-    screenshot: {
-      /** Base64 image data URL. */
-      data: string;
-      width: number;
-      height: number;
-    };
-    nodes: Record<string, Rect>;
   }
 
   interface TimingSummary {
@@ -961,6 +961,7 @@ export interface TraceEvent {
       documentLoaderURL?: string;
       frames?: {
         frame: string;
+        url: string;
         parent?: string;
         processId?: number;
       }[];
@@ -997,6 +998,10 @@ export interface TraceEvent {
       compositeFailed?: number;
       unsupportedProperties?: string[];
       size?: number;
+      /** Responsiveness data. */
+      interactionType?: 'drag'|'keyboard'|'tapOrClick';
+      maxDuration?: number;
+      type?: string;
     };
     frame?: string;
     name?: string;
@@ -1013,6 +1018,40 @@ export interface TraceEvent {
   id2?: {
     local?: string;
   };
+}
+
+declare module Trace {
+  /**
+   * Base event of a `ph: 'X'` 'complete' event. Extend with `name` and `args` as
+   * needed.
+   */
+  interface CompleteEvent {
+    ph: 'X';
+    cat: string;
+    pid: number;
+    tid: number;
+    dur: number;
+    ts: number;
+    tdur: number;
+    tts: number;
+  }
+
+  /**
+   * Base event of a `ph: 'b'|'e'|'n'` async event. Extend with `name`, `args`, and
+   * more specific `ph` (if needed).
+   */
+  interface AsyncEvent {
+    ph: 'b'|'e'|'n';
+    cat: string;
+    pid: number;
+    tid: number;
+    ts: number;
+    id: string;
+    scope?: string;
+    // TODO(bckenny): No dur on these. Sort out optional `dur` on trace events.
+    /** @deprecated there is no `dur` on async events. */
+    dur: number;
+  }
 }
 
 /**

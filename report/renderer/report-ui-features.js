@@ -60,6 +60,7 @@ export class ReportUIFeatures {
    */
   initFeatures(lhr) {
     this.json = lhr;
+    this._fullPageScreenshot = Util.getFullPageScreenshot(lhr);
 
     if (this._topbar) {
       this._topbar.enable(lhr);
@@ -242,7 +243,7 @@ export class ReportUIFeatures {
 
     tablesWithUrls.forEach((tableEl) => {
       const rowEls = getTableRows(tableEl);
-      const thirdPartyRows = this._getThirdPartyRows(rowEls, this.json.finalUrl);
+      const thirdPartyRows = this._getThirdPartyRows(rowEls, Util.getFinalDisplayedUrl(this.json));
 
       // create input box
       const filterTemplate = this._dom.createComponent('3pFilter');
@@ -299,18 +300,13 @@ export class ReportUIFeatures {
    * @param {Element} rootEl
    */
   _setupElementScreenshotOverlay(rootEl) {
-    const fullPageScreenshot =
-      this.json.audits['full-page-screenshot'] &&
-      this.json.audits['full-page-screenshot'].details &&
-      this.json.audits['full-page-screenshot'].details.type === 'full-page-screenshot' &&
-      this.json.audits['full-page-screenshot'].details;
-    if (!fullPageScreenshot) return;
+    if (!this._fullPageScreenshot) return;
 
     ElementScreenshotRenderer.installOverlayFeature({
       dom: this._dom,
       rootEl: rootEl,
       overlayContainerEl: rootEl,
-      fullPageScreenshot,
+      fullPageScreenshot: this._fullPageScreenshot,
     });
   }
 
@@ -318,13 +314,13 @@ export class ReportUIFeatures {
    * From a table with URL entries, finds the rows containing third-party URLs
    * and returns them.
    * @param {HTMLElement[]} rowEls
-   * @param {string} finalUrl
+   * @param {string} finalDisplayedUrl
    * @return {Array<HTMLElement>}
    */
-  _getThirdPartyRows(rowEls, finalUrl) {
+  _getThirdPartyRows(rowEls, finalDisplayedUrl) {
     /** @type {Array<HTMLElement>} */
     const thirdPartyRows = [];
-    const finalUrlRootDomain = Util.getRootDomain(finalUrl);
+    const finalDisplayedUrlRootDomain = Util.getRootDomain(finalDisplayedUrl);
 
     for (const rowEl of rowEls) {
       if (rowEl.classList.contains('lh-sub-item-row')) continue;
@@ -334,7 +330,7 @@ export class ReportUIFeatures {
 
       const datasetUrl = urlItem.dataset.url;
       if (!datasetUrl) continue;
-      const isThirdParty = Util.getRootDomain(datasetUrl) !== finalUrlRootDomain;
+      const isThirdParty = Util.getRootDomain(datasetUrl) !== finalDisplayedUrlRootDomain;
       if (!isThirdParty) continue;
 
       thirdPartyRows.push(rowEl);
@@ -348,7 +344,10 @@ export class ReportUIFeatures {
    */
   _saveFile(blob) {
     const ext = blob.type.match('json') ? '.json' : '.html';
-    const filename = getLhrFilenamePrefix(this.json) + ext;
+    const filename = getLhrFilenamePrefix({
+      finalDisplayedUrl: Util.getFinalDisplayedUrl(this.json),
+      fetchTime: this.json.fetchTime,
+    }) + ext;
     if (this._opts.onSaveFileOverride) {
       this._opts.onSaveFileOverride(blob, filename);
     } else {

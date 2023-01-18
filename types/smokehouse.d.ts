@@ -13,22 +13,23 @@ declare global {
     interface ExpectedLHR {
       audits: Record<string, any>;
       requestedUrl: string;
-      finalUrl: string | RegExp;
+      finalDisplayedUrl: string | RegExp;
       userAgent?: string | RegExp;
-      runWarnings?: Array<string|RegExp> | {length: string | number};
+      runWarnings?: any;
       runtimeError?: {
         code?: any;
         message?: any;
       };
       timing?: {
         entries?: any
-      }
+      };
+      fullPageScreenshot?: any;
     }
 
     export type ExpectedRunnerResult = {
       lhr: ExpectedLHR,
       artifacts?: Partial<Record<keyof Artifacts|'_maxChromiumVersion'|'_minChromiumVersion', any>>
-      networkRequests?: {length: number, _legacyOnly?: boolean, _fraggleRockOnly?: boolean};
+      networkRequests?: any;
     }
 
     export interface TestDfn {
@@ -37,7 +38,7 @@ declare global {
       /** Expected test results. */
       expectations: ExpectedRunnerResult;
       /** An optional custom config. If none is present, uses the default Lighthouse config. */
-      config?: Config.Json;
+      config?: Config;
       /** If test is performance sensitive, set to true so that it won't be run parallel to other tests. */
       runSerially?: boolean;
     }
@@ -52,13 +53,13 @@ declare global {
       {expectations: Smokehouse.ExpectedRunnerResult | Array<Smokehouse.ExpectedRunnerResult>}
 
     export type LighthouseRunner =
-      {runnerName?: string} & ((url: string, configJson?: Config.Json, runnerOptions?: {isDebug?: boolean; useFraggleRock?: boolean}) => Promise<{lhr: LHResult, artifacts: Artifacts, log: string}>);
+      {runnerName?: string} & ((url: string, config?: Config, runnerOptions?: {isDebug?: boolean; useLegacyNavigation?: boolean}) => Promise<{lhr: LHResult, artifacts: Artifacts, log: string}>);
 
     export interface SmokehouseOptions {
       /** If true, performs extra logging from the test runs. */
       isDebug?: boolean;
-      /** If true, uses the new Fraggle Rock runner. */
-      useFraggleRock?: boolean;
+      /** If true, use the legacy navigation runner. */
+      useLegacyNavigation?: boolean;
       /** Manually set the number of jobs to run at once. `1` runs all tests serially. */
       jobs?: number;
       /** The number of times to retry failing tests before accepting. Defaults to 0. */
@@ -67,6 +68,8 @@ declare global {
       lighthouseRunner?: LighthouseRunner;
       /** A function that gets a list of URLs requested to the server since the last fetch. */
       takeNetworkRequestUrls?: () => string[];
+      /** A function run once before all smoke tests. */
+      setup?: () => Promise<void>;
     }
 
     export interface SmokehouseLibOptions extends SmokehouseOptions {

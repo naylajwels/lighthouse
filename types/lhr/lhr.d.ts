@@ -5,6 +5,7 @@
  */
 
 import {Result as AuditResult} from './audit-result';
+import AuditDetails from './audit-details.js';
 import {ConfigSettings} from './settings';
 
 /**
@@ -15,8 +16,15 @@ interface Result {
   gatherMode: Result.GatherMode;
   /** The URL that Lighthouse initially navigated to. Will be `undefined` in timespan/snapshot. */
   requestedUrl?: string;
-  /** The post-redirects URL that Lighthouse loaded. */
-  finalUrl: string;
+  /** URL of the last document request during a Lighthouse navigation. Will be `undefined` in timespan/snapshot. */
+  mainDocumentUrl?: string;
+  /**
+   * For historical reasons, this will always be the same as `mainDocumentUrl`.
+   * @deprecated
+   */
+  finalUrl?: string;
+  /** The URL displayed on the page after Lighthouse finishes. */
+  finalDisplayedUrl: string;
   /** The ISO-8601 timestamp of when the results were generated. */
   fetchTime: string;
   /** The version of Lighthouse with which these results were generated. */
@@ -48,6 +56,8 @@ interface Result {
   };
   /** An array containing the result of all stack packs. */
   stackPacks?: Result.StackPack[];
+  /** Screenshot taken of the full page, with node rects referencing audit results. If there was an error with collection, this is null. If disabled via the disableFullPageScreenshot setting, this is undefined. */
+  fullPageScreenshot?: Result.FullPageScreenshot | null;
 }
 
 // Result namespace
@@ -59,6 +69,8 @@ declare module Result {
     networkUserAgent: string;
     /** The benchmark index number that indicates rough device class. */
     benchmarkIndex: number;
+    /** Many benchmark indexes. */
+    benchmarkIndexes?: number[];
     /** The version of libraries with which these results were generated. Ex: axe-core. */
     credits?: Record<string, string|undefined>,
   }
@@ -127,6 +139,16 @@ declare module Result {
     iconDataURL: string;
     /** A set of descriptions for some of Lighthouse's audits, keyed by audit `id`. */
     descriptions: Record<string, string>;
+  }
+
+  interface FullPageScreenshot {
+    screenshot: {
+      /** Base64 image data URL. */
+      data: string;
+      width: number;
+      height: number;
+    };
+    nodes: Record<string, AuditDetails.Rect>;
   }
 
   /**
