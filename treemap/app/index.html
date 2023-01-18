@@ -11,8 +11,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
   <title>Lighthouse Treemap</title>
-  <link rel="icon"
-    href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABJ0lEQVR4AWIY0uB/mnEAoL2yuKoYCMNoCynhdYC7rpAacHeXLe4Oe3SPNZBSUsKU8BE7f3DmH8Nezrnb3Dse0uVePF3oheK7EMQMlVxguDDnbtQDJYLkGUFIl7tRv8XubKQjhCSBjQBwsBvwGIJXPFoIyAfkAzBYdEk/5UP3wq8NyAfQh4utHG428CX7g8BEXSI2+R7gZq1RVkwMlzaaC7hen5YWE8XT5gKu1o5lxcRA8bHBJdjwpcXZ5vPNBez1CVkxMVolzMi7Cz2euBLYaAculiM8/YD+0ka2mPbLmv5JiHYzV0yEp0c/INzNbDGxpn8Sot3MFxO+gRkoERwxcTYNLLYK/ROgIl5ozmYs/IdyQPizRmWx5ptAbwBDbPpNoDeAIea/CU+XUJ7HqkiUQgAAAABJRU5ErkJggg==">
+  <link rel="icon" href='data:image/svg+xml;utf8,<svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path d="m14 7 10-7 10 7v10h5v7h-5l5 24H9l5-24H9v-7h5V7Z" fill="%23F63"/><path d="M31.561 24H14l-1.689 8.105L31.561 24ZM18.983 48H9l1.022-4.907L35.723 32.27l1.663 7.98L18.983 48Z" fill="%23FFA385"/><path fill="%23FF3" d="M20.5 10h7v7h-7z"/></svg>'>
   <meta name="theme-color" content="#304ffe">
   <link rel="stylesheet" href="styles/bundled.css">
   <link rel="canonical" href="https://googlechrome.github.io/lighthouse/treemap/">
@@ -47,15 +46,10 @@ Unless required by applicable law or agreed to in writing, software distributed 
         <div class="lh-header--section">
           <span class="lh-logotitle">
             <!-- Lighthouse logo. Stolen from templates.html -->
-            <svg class="lh-topbar__logo" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-              <clipPath id="a">
-                <path d="M0 0h48v48H0z"/>
-              </clipPath>
-              <g clip-path="url(#a)">
-                <path d="M15 17.5V8.268a.5.5 0 0 1 .223-.416l8.5-5.667a.5.5 0 0 1 .554 0l8.5 5.667a.5.5 0 0 1 .223.416V17.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-.5.5h-2.905a.5.5 0 0 0-.493.586l3.796 22.828a.5.5 0 0 1-.493.586h-24.81a.5.5 0 0 1-.493-.586l3.796-22.828a.5.5 0 0 0-.493-.586H11.5a.5.5 0 0 1-.5-.5v-5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 0 .5-.5z" fill="#f63"/>
-                <path d="M21.07 48h-9.476a.5.5 0 0 1-.492-.586l.563-3.385L34.44 32.641l1.332 8.007zm9.988-24-17.52 8.76 1.36-8.174a.5.5 0 0 0-.49-.586z" fill="#fff" opacity=".4"/>
-                <path d="M20 10.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5z" fill="#ff3"/>
-              </g>
+            <svg role="img" class="lh-topbar__logo" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+              <path d="m14 7 10-7 10 7v10h5v7h-5l5 24H9l5-24H9v-7h5V7Z" fill="#F63"/>
+              <path d="M31.561 24H14l-1.689 8.105L31.561 24ZM18.983 48H9l1.022-4.907L35.723 32.27l1.663 7.98L18.983 48Z" fill="#FFA385"/>
+              <path fill="#FF3" d="M20.5 10h7v7h-7z"/>
             </svg>
 
             <span class="lh-header--title lh-text-dim">Lighthouse Treemap</span>
