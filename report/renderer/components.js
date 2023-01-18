@@ -536,6 +536,7 @@ function createTopbarComponent(dom) {
   const el2 = dom.createElement("div", "lh-topbar");
   const el3 = dom.createElementNS("http://www.w3.org/2000/svg", "svg", "lh-topbar__logo");
   el3.setAttribute('role', 'img');
+  el3.setAttribute('title', 'Lighthouse logo');
   el3.setAttribute('fill', 'none');
   el3.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
   el3.setAttribute('viewBox', '0 0 48 48');
