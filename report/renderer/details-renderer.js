@@ -35,8 +35,8 @@ export class DetailsRenderer {
   /**
    * @param {DOM} dom
    * @param {{
-   *  fullPageScreenshot?: LH.Audit.Details.FullPageScreenshot,
-   *  entityClassification?: LH.Audit.Details.EntityClassification,
+   *  fullPageScreenshot?: LH.Result.FullPageScreenshot,
+   *  entityClassification?: LH.Result.EntityClassification,
    * }} [options]
    */
   constructor(dom, options = {}) {
@@ -389,7 +389,12 @@ export class DetailsRenderer {
     renderedRows[0]?.classList.add('lh-row--group');
 
     const entityName = group.entity?.toString() || '';
-    const matchedEntity = this._entityClassification?.entities[entityName];
+    const entityIndex = this._entityClassification?.nameLUT[entityName];
+    /** @type {LH.Result.Entity|undefined} */
+    let matchedEntity;
+    if (typeof entityIndex !== 'undefined') {
+      matchedEntity = this._entityClassification?.entities[entityIndex];
+    }
 
     if (matchedEntity?.category) {
       const categoryChipEl = this._dom.createElement('span');
