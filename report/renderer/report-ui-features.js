@@ -243,7 +243,8 @@ export class ReportUIFeatures {
 
     tablesWithUrls.forEach((tableEl) => {
       const rowEls = getTableRows(tableEl);
-      const thirdPartyRows = this._getThirdPartyRows(rowEls, Util.getFinalDisplayedUrl(this.json));
+      const thirdPartyRowEls = this._getThirdPartyRows(
+        rowEls, Util.getFinalDisplayedUrl(this.json));
 
       // create input box
       const filterTemplate = this._dom.createComponent('3pFilter');
@@ -254,7 +255,7 @@ export class ReportUIFeatures {
         let even = true;
         let rowEl = rowEls[0];
         while (rowEl) {
-          const shouldHide = shouldHideThirdParty && thirdPartyRows.includes(rowEl);
+          const shouldHide = shouldHideThirdParty && thirdPartyRowEls.includes(rowEl);
 
           // Iterate subsequent associated sub item rows.
           do {
@@ -271,12 +272,12 @@ export class ReportUIFeatures {
       });
 
       this._dom.find('.lh-3p-filter-count', filterTemplate).textContent =
-          `${thirdPartyRows.length}`;
+          `${thirdPartyRowEls.length}`;
       this._dom.find('.lh-3p-ui-string', filterTemplate).textContent =
           Util.i18n.strings.thirdPartyResourcesLabel;
 
-      const allThirdParty = thirdPartyRows.length === rowEls.length;
-      const allFirstParty = !thirdPartyRows.length;
+      const allThirdParty = thirdPartyRowEls.length === rowEls.length;
+      const allFirstParty = !thirdPartyRowEls.length;
 
       // If all or none of the rows are 3rd party, hide the control.
       if (allThirdParty || allFirstParty) {
@@ -318,25 +319,29 @@ export class ReportUIFeatures {
    * @return {Array<HTMLElement>}
    */
   _getThirdPartyRows(rowEls, finalDisplayedUrl) {
-    /** @type {Array<HTMLElement>} */
-    const thirdPartyRows = [];
     const finalDisplayedUrlRootDomain = Util.getRootDomain(finalDisplayedUrl);
+    const mainEntityName = this.json.entityClassification?.firstParty;
 
+    /** @type {Array<HTMLElement>} */
+    const thirdPartyRowEls = [];
     for (const rowEl of rowEls) {
-      if (rowEl.classList.contains('lh-sub-item-row')) continue;
+      if (mainEntityName && rowEl.dataset?.entity) {
+        // We rely on entity-classification for new LHRs that support it.
+        if (rowEl.dataset?.entity === mainEntityName) continue;
+      } else {
+        // Continue the legacy root domain check for back compat.
+        const urlItem = rowEl.querySelector('div.lh-text__url');
+        if (!urlItem) continue;
+        const datasetUrl = urlItem.dataset.url;
+        if (!datasetUrl) continue;
+        const isThirdParty = Util.getRootDomain(datasetUrl) !== finalDisplayedUrlRootDomain;
+        if (!isThirdParty) continue;
+      }
 
-      const urlItem = rowEl.querySelector('div.lh-text__url');
-      if (!urlItem) continue;
-
-      const datasetUrl = urlItem.dataset.url;
-      if (!datasetUrl) continue;
-      const isThirdParty = Util.getRootDomain(datasetUrl) !== finalDisplayedUrlRootDomain;
-      if (!isThirdParty) continue;
-
-      thirdPartyRows.push(rowEl);
+      thirdPartyRowEls.push(rowEl);
     }
 
-    return thirdPartyRows;
+    return thirdPartyRowEls;
   }
 
   /**
