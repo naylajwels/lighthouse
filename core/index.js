@@ -168,5 +168,6 @@ export {
   generateReport,
   auditFlowArtifacts,
   getAuditList,
+  upgradeLhrForCompatability,
   traceCategories,
 };
