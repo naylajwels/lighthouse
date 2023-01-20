@@ -9,7 +9,7 @@ import assert from 'assert/strict';
 import jsdom from 'jsdom';
 
 import {Util} from '../../renderer/util.js';
-import {I18n} from '../../renderer/i18n.js';
+import {Formatter} from '../../renderer/formatter.js';
 import {DOM} from '../../renderer/dom.js';
 import {DetailsRenderer} from '../../renderer/details-renderer.js';
 import {CriticalRequestChainRenderer} from '../../renderer/crc-details-renderer.js';
@@ -73,7 +73,7 @@ describe('DetailsRenderer', () => {
   let detailsRenderer;
 
   before(() => {
-    Util.i18n = new I18n('en', {...Util.UIStrings});
+    Util.formatter = new Formatter('en');
 
     const {document} = new jsdom.JSDOM().window;
     dom = new DOM(document);
@@ -81,7 +81,7 @@ describe('DetailsRenderer', () => {
   });
 
   after(() => {
-    Util.i18n = undefined;
+    Util.formatter = undefined;
   });
 
   it('renders tree structure', () => {
