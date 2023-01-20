@@ -113,6 +113,8 @@ class BFCacheFailures extends FRGatherer {
       waitForLoadEvent(session, 0).promise,
     ]);
 
+    // DevTools e2e tests can sometimes fail on the next command if we progress too fast.
+    // The only reliable way to prevent this is to wait for an arbitrary period of time.
     await new Promise(resolve => setTimeout(resolve, TEMP_PAGE_PAUSE_TIMEOUT));
 
     const [, frameNavigatedEvent] = await Promise.all([
