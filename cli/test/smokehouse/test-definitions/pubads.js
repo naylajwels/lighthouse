@@ -22,6 +22,7 @@ const expectations = {
     audits: {
       // We just want to ensure the plugin had a chance to run without error.
       'ad-render-blocking-resources': {scoreDisplayMode: 'notApplicable'},
+      'blocking-load-events': {scoreDisplayMode: 'notApplicable'},
     },
   },
 };

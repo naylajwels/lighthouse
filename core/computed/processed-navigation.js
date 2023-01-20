@@ -15,6 +15,11 @@ class ProcessedNavigation {
      * @return {Promise<LH.Artifacts.ProcessedNavigation>}
     */
   static async compute_(trace, context) {
+    if ('timeOriginEvt' in trace) {
+      // @ts-expect-error TODO: Remove this hacky workaround once pubads is updated
+      return LHTraceProcessor.processNavigation(trace);
+    }
+
     const processedTrace = await ProcessedTrace.request(trace, context);
     return LHTraceProcessor.processNavigation(processedTrace);
   }
